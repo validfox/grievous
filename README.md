@@ -51,6 +51,12 @@
 | -cosim | `Not support yet.` |
 | -fault | `Not support yet.` |
 | -tfile [tfile] | Specify timing file '.tfile'. `Multiple tfile files can be specified by calling '-tfile [tfile]' multiple times.` |
+| -lsf | Calling 'bsub'. `By default, bsub is called. But if LSF is not installed, use '-nolsf' in command line.` |
+| -nolsf | Do not call 'bsub'. |
+| -interactivelsf | Calling 'bsub -I' for interactive mode of LSF. |
+| -nointeractivelsf | Do not use '-I' of bsub command. `By default, a single simulation use 'bsub -I ...' to submit job to LSF.` |
+| -jname [job_queue_name] | Specify job queue name of bjobs. |
+| -rcn [number] | Specify compile repeat times. `If compile fails, the script re-compiles database, by default, 3 times.` |
 
     TBA
 
