@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 
+#
+# Author: xeroncn+validfox.grievous@gmail.com
+# Date: 2024.09.23
+# Licensed under the MIT license. See LICENSE file in the project root for details.
+#
+
 #import sys, os, re, glob, stat, shutil, collections, random, datetime, time, threading, signal
 import sys, os, datetime, shutil, re, collections, threading, random, glob, time, signal
 
