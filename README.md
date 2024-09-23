@@ -56,7 +56,34 @@
 | -interactivelsf | Calling 'bsub -I' for interactive mode of LSF. |
 | -nointeractivelsf | Do not use '-I' of bsub command. `By default, a single simulation use 'bsub -I ...' to submit job to LSF.` |
 | -jname [job_queue_name] | Specify job queue name of bjobs. |
-| -rcn [number] | Specify compile repeat times. `If compile fails, the script re-compiles database, by default, 3 times.` |
+| -rcn [number] | Specify compile repeat times. `If compile fails, the script re-compiles database, by default, by 3 times.` |
+| -sim_root [folder_path] | Specify a folder that all the simulation folders are created under that folder. `By default, the folder is defined in global variable 'SIM_ROOT'.` |
+| -d [folder_path] | Specify a folder to run simulation, instead of creating one automatically. |
+| -repeat [number] | Run a simulation or regression for [number] times. `For example, to run a test for 10 times, use 'grievous -t test0 -repeat 10'.` |
+| -append [string] | For generated folder, its name is the test name. In order to distinguish the test from another run, append something to the folder name. `For example: [test_name]_[string] is the new name of simulation folder.` |
+| -setup [another_config_file] | Specify another configuration file, instead of using the default one 'sim.setup'. |
+| -max [number] | Specify the maxium number of parallel running jobs in regression. `By default, the max number is 10. It's useful in regression when computer resoure is limited.` |
+| -qc [number] | Simulation quits when the count of error is larger than [number]. |
+| -m [host_name] | Specify the host or hosts where the jobs are submitted in LSF. |
+| -inf | `Not support yet.` |
+| -ext_lsf_opt "string" | Pass some options to bsub from command line. `Users can also specify options to bsub from configuration files.` |
+| -ext_comp_opt "string" | Pass some options to simulator at compilation stage. `Users can also specify options to bsub from configuration files.` |
+| -ext_sim_opt "string" | Pass some options to simulator at simulation stage. `Users can also specify options to bsub from configuration files.` |
+| -ext_dbg_opt "string" | Pass some options to Cadence Simvision, Synopsys Verdi. `Users can also specify options to bsub from configuration files.` |
+| -ext_opt "string" | Pass some options to simulators, at both compilation and simulation stages. `Users can also specify options to bsub from configuration files.` |
+| -co | Compile but not simulate. |
+| -gs | Generate simulation folder and scripts, but do NOT start compile and simulate. |
+| -cov | Enable coverage collection. |
+| -cm | For regression, merge the coverage of every tests together. |
+| -nocov | Disable coverage collection, higher priority than '-cov'. |
+| -refine [refine_file_name] | Specify refine file used in coverage collection and merge. |
+| -gui | Run simulation in gui mode. |
+| -nc | Use Cadence Xcelium as the simulator. `The default simulator is set to Xcelium.` |
+| -vcs | Use Synopsys VCS as the simulator. |
+| -simtmp | For Cadence Xcelium, a user-defined folder can be set as simulation intermedia folder. `See more details in user guide of Xcelium.` |
+| +[options] | Any options with leading '+' will be passed to simulator directly. |
+| -[custom_switch] [value] | Enable a custom switch, and give a value of it. `[value] is not necessary.` |
+| --[custom_switch] | Disable a custom switch. `If a custom swithc is default on in configuration file. It's also can be disabled from command line.` |
 
     TBA
 
@@ -68,6 +95,10 @@
     TBA
 
 # Global variables
+
+    TBA
+
+# Custom switch
 
     TBA
 
