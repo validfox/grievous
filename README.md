@@ -28,9 +28,30 @@
 # Usage, arguments
 | Argument | Description |
 | - | - |
-| -t/--test [test name] | Specify the name of a test. `It's used to find a file which name is [test name].sv, and the [test name] is passed to simulatior as +UVM_TESTNAME=[test name]. So, make sure the file name and uvm_test name are same with [test name].` |
-| -c/--clean | Clean existing simulation folder. `Without this arguments, the compile stage keeps incremental compilation if simulation folder is reused.` |
-| -w/--wave [wave type] | Dump signals to waveform files. `[wave type] can be ommitted, the default waveform type of Cadence Xceilum is .shm, and the default type of Synopsys VCS is fsdb. Wave type can also be specified in command line, it supports [-w shm, -w vcd, -w fsdb, -w vpd] for now.` |
+| --debug | Print more message. `For debug only.` |
+| -h | Print help message of the script. `Without start a simulation.` |
+| -t [test_name] | Specify the name of a test. `It's used to find a file which name is [test_name].sv, and the [test_name] is passed to simulatior as +UVM_TESTNAME=[test_name]. So, make sure the file name and uvm_test name are same with [test_name]. Specify more than one test will start a regression. For example, '-t test0 -t test1' is workable.` |
+| -r [regression_list_file] | Sepcify a file of regression test list. `See an example file in below.` |
+| -g [regression_group_name] | Sepcify a group name in regression list file. `More than one group can be selected. For example, using '-g A -g B' in the same command line will select two groups in the list.` |
+| -uvm | Enable the compilation of UVM packages. `By default, UVM packages are compiled.` |
+| -nouvm | Disable the compilation of UVM packages. |
+| -c | Clean existing simulation folder. `Without this arguments, the compile stage keeps incremental compilation if simulation folder is reused.` |
+| -s [seed] | Specify the seed of a simulation. `The seed will passed to simulators. If seed isn't specified, the script generates a random seed in background.` |
+| -w [wave_type] | Dump signals to waveform files. `[wave_type] can be ommitted, the default waveform type of Cadence Xceilum is .shm, and the default type of Synopsys VCS is fsdb. Wave type can also be specified in command line, it supports [-w shm, -w vcd, -w fsdb, -w vpd] for now. The signals and hierachies are specified in a user-defined file.` |
+| -wall [wave_type] | Dump all signals in all hierachy into waveform files. |
+| -atm | Print extra message in simulation. `Extra message includs folder name, command and system time. It's useful infomation when the simulation runs for days, weeks, or even months.` |
+| -noatm | Disable extra message printed. `Note that the extra message is enabled by default in a single simulation.` |
+| -input [tcl_file] | Specify a tcl file and pass it to simulator. `Pass to Cadence Xcelium: 'xrun -input [tcl_file] ...'` |
+| -b [block_name] | Specify block name for block level verification. `Do NOT use this argument if it's a TOP level verification. The [block_name] should be the folder name of a block level design.` |
+| -dv[\d*] | Means -dv, -dv0, -dv1, or -dv2..., specify another dv folder as default. `If the dv folder name is 'dv', -dv can be ommitted.` |
+| -localdv[\d*] | Means -localdv, -localdv0, -localdv1, or -localdv2..., specify another dv folder as default. `LocalDV is a temprary DV environment, which is assumed to be a non-UVM environment which is used by design engineers.` |
+| -rtl | Pre simulation with RTL only. `By default, it's a pre simulation.` |
+| -gate | Post simulation with gate level netlist. |
+| -fpga | Simualtion for FPGA use. |
+| -cosim | `Not support yet.` |
+| -fault | `Not support yet.` |
+| -tfile [tfile] | Specify timing file '.tfile'. `Multiple tfile files can be specified by calling '-tfile [tfile]' multiple times.` |
+
     TBA
 
 # Configuration files
@@ -41,6 +62,14 @@
     TBA
 
 # Global variables
+
+    TBA
+
+# Regression list file example
+
+    TBA
+
+# Folder structure
 
     TBA
 
