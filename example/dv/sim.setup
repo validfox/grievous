@@ -1,0 +1,28 @@
+DESIGN_TOP: example
+TB_TOP: tb_top
+
+DESIGN_FILES: -f design.f
+DV_FILES: -f dv.f
+
+CUSTOM_SWITCH: cs0
+CUSTOM_SWITCH: cs1
+
+cs0_PRE_COMP_CMD: echo "cs0_pre_comp_cmd"
+!cs0_PRE_COMP_CMD: echo "not cs0_pre_comp_cmd"
+cs0_POST_COMP_CMD: echo "cs0_pre_comp_cmd"
+!cs0_POST_COMP_CMD: echo "not cs0_pre_comp_cmd"
+
+cs0_PRE_COMP_CMD: echo "cs0_pre_comp_cmd 1"
+!cs0_PRE_COMP_CMD: echo "not cs0_pre_comp_cmd 1"
+cs0_POST_COMP_CMD: echo "cs0_pre_comp_cmd 1"
+!cs0_POST_COMP_CMD: echo "not cs0_pre_comp_cmd 1"
+
+cs0_PRE_SIM_CMD: echo "cs0_pre_sim_cmd"
+!cs0_PRE_SIM_CMD: echo "not cs0_pre_sim_cmd"
+cs0_POST_SIM_CMD: echo "cs0_pre_sim_cmd"
+!cs0_POST_SIM_CMD: echo "not cs0_pre_sim_cmd"
+
+cs0_cs1_PRE_COMP_CMD: echo "cs0_cs1_PRE_COMP_CMD"
+cs0_!cs1_PRE_COMP_CMD: echo "cs0_!cs1_PRE_COMP_CMD"
+!cs0_!cs1_PRE_COMP_CMD: echo "!cs0_!cs1_PRE_COMP_CMD"
+!cs0_cs1_PRE_COMP_CMD: echo "!cs0_cs1_PRE_COMP_CMD"
