@@ -102,14 +102,13 @@
     setenv SIM_ROOT $PRJ_ROOT/sim
 
 # Configuration files
-    The default name is configuration file is 'sim.setup'.
-
-    For block level or top level verification, a default 'sim.setup' should be created in this rule:
+    The default name of configuration file is 'sim.setup'.
+    For block level or top level verification, a default 'sim.setup' should be created under this rule:
         $DV_ROOT/sim.setup
         $DESIGN_ROOT/[block_name]/dv/sim.setup
     
     In configuration files, each line is a key-value pair,
-        which guides the scripts to run simulation.
+        which guides the script to run simulation.
     For example, 'DESIGN_TOP: example' is used to tell the script the top module name.
 
 | KeyWord | Value |
