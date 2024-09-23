@@ -103,9 +103,9 @@
 
 # Configuration files
     The default name of configuration file is 'sim.setup'.
-    For block level or top level verification, a default 'sim.setup' should be created under this rule:
-        $DV_ROOT/sim.setup
+    For block level or top level verification, a default 'sim.setup' should be created by user:
         $DESIGN_ROOT/[block_name]/dv/sim.setup
+        $DV_ROOT/sim.setup
     
     In configuration files, each line is a key-value pair,
         which guides the script to run simulation.
