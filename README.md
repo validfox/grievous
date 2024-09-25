@@ -3,7 +3,7 @@
 
     An EDA simulator wrapper script of Cadence Xcelium, Synopsys VCS, etc.
     Use one line command to call different digital simulators in short.
-    An example is to start a simulation with a command like 'grievous -t test0'.
+    An example is to start a simulation with a command like 'python3 grievous.py -t test0'.
 
     Follow MIT license.
 
@@ -65,7 +65,7 @@
 | -rcn [number] | Specify compile repeat times. `If compile fails, the script re-compiles database, by default, by 3 times.` |
 | -sim_root [folder_path] | Specify a folder that all the simulation folders are created under that folder. `By default, the folder is defined in global variable 'SIM_ROOT'.` |
 | -d [folder_path] | Specify a folder to run simulation, instead of creating one automatically. |
-| -repeat [number] | Run a simulation or regression for [number] times. `For example, to run a test for 10 times, use 'grievous -t test0 -repeat 10'.` |
+| -repeat [number] | Run a simulation or regression for [number] times. `For example, to run a test for 10 times, use 'python3 grievous.py -t test0 -repeat 10'.` |
 | -append [string] | For generated folder, its name is the test name. In order to distinguish the test from another run, append something to the folder name. `For example: [test_name]_[string] is the new name of simulation folder.` |
 | -setup [another_config_file] | Specify another configuration file, instead of using the default one 'sim.setup'. |
 | -max [number] | Specify the maxium number of parallel running jobs in regression. `By default, the max number is 10. It's useful in regression when computer resoure is limited.` |
@@ -199,17 +199,17 @@
         some have '!' in front of custom switch which means negtive selections.
     
     To enable cs0 custom swith in command line, use '-cs0'
-        > grievous -t test0 -cs0
+        > python3 grievous.py -t test0 -cs0
         as cs0 is enabled by default in configuration file, -cs0 can be ommitted.
     
     To disable cs0 custom switch in command line, use '--cs0'
-        > grievous -t test0 --cs0
+        > python3 grievous.py -t test0 --cs0
     
     To enable cs0, but disable cs1 in command line
-        > grievous -t test0 -cs0 --cs1
+        > python3 grievous.py -t test0 -cs0 --cs1
     
     To disable cs0, but enable cs1 in command line
-        > grievous -t test0 --cs0 -cs1
+        > python3 grievous.py -t test0 --cs0 -cs1
     
     The line
     cs0_!cs1_PRE_COMP_CMD: echo "cs0_!cs1_PRE_COMP_CMD"
@@ -228,7 +228,7 @@
 
     '-seed 2' and '-nocov' are options for test1 and test3, respectively, not affect test0.
 
-    'grievous -r full.lst -g A -g B -cov -cm' will run a regression, in which, test0 run 3 times,
+    'python3 grievous.py -r full.lst -g A -g B -cov -cm' will run a regression, in which, test0 run 3 times,
         test1 run once but with 2 as seed,
         and test3 run twice.
         Only collect the coverage of test0 and test1, as '-nocov' is used in the line of test3.
@@ -241,4 +241,4 @@
     TBA
 
 # Contact
-xeroncn+validfox.grievous@gmail.com
+xeroncn+validfox.python3 grievous.py@gmail.com
