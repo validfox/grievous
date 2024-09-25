@@ -214,7 +214,7 @@
     The line
     cs0_!cs1_PRE_COMP_CMD: echo "cs0_!cs1_PRE_COMP_CMD"
     is only functional when cs0 is enable and cs1 is disable,
-    aka 'grevious -cs0 --cs1 ...' or 'grevious --cs1 ...'.
+    aka 'python3 grievous.py -cs0 --cs1 ...' or 'python3 grievous.py --cs1 ...'.
         Note: cs0 is default on, so -cs0 is not necessary in this context.
 
 # Regression list file example
