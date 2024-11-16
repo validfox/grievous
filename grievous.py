@@ -419,7 +419,7 @@ def f_init_dicts():
     cfg_file_items_dict['cov_refine_files'] = []
     cfg_file_items_dict['warn_str'] = ['UVM_WARNING', '*W', 'Warning!'] #TODO: default warn list? UVM_WARNING? *W?
     cfg_file_items_dict['ignore_warn_str'] = []
-    cfg_file_items_dict['err_str'] = ['UVM_ERROR', 'UVM_FATAL', '*E', '*SE', '*F', 'Syntax error'] #TODO: default error list? such as UVM_ERROR? UVM_FATAL? *E? *F?
+    cfg_file_items_dict['err_str'] = ['UVM_ERROR', 'UVM_FATAL', '*E', '*SE', '*F', 'Syntax error', 'Error-'] #TODO: default error list? such as UVM_ERROR? UVM_FATAL? *E? *F?
     cfg_file_items_dict['ignore_err_str'] = []
     cfg_file_items_dict['other_sim_log_files'] = []
     cfg_file_items_dict['blk_root'] = ''
@@ -971,7 +971,9 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
             else:
                 f.write('-l $run_dir/sim_${date_str}__${time_str}_seed$seed.log\n')
         if cmd_line_args_dict['simulator'] == 'vcs':
-            f.write('$run_dir/simv -l $run_dir/sim_${date_str}__${time_str}_seed$seed.log\n')
+            f.write('$run_dir/simv\\\n')
+            f.write('+UVM_TESTNAME=$case_name\\\n')
+            f.write('-l $run_dir/sim_${date_str}__${time_str}_seed$seed.log\n')
             if cmd_line_args_dict['wave'] or cmd_line_args_dict['wall']:
                 if cmd_line_args_dict['wave_type'] == 'fsdb':
                     f.write('\\ln -fs $run_dir/novas.fsdb $run_dir/waves.fsdb\n')
