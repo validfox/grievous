@@ -419,7 +419,7 @@ def f_init_dicts():
     cfg_file_items_dict['cov_refine_files'] = []
     cfg_file_items_dict['warn_str'] = ['UVM_WARNING', '*W', 'Warning!'] #TODO: default warn list? UVM_WARNING? *W?
     cfg_file_items_dict['ignore_warn_str'] = []
-    cfg_file_items_dict['err_str'] = ['UVM_ERROR', 'UVM_FATAL', '*E', '*SE', '*F'] #TODO: default error list? such as UVM_ERROR? UVM_FATAL? *E? *F?
+    cfg_file_items_dict['err_str'] = ['UVM_ERROR', 'UVM_FATAL', '*E', '*SE', '*F', 'Syntax error'] #TODO: default error list? such as UVM_ERROR? UVM_FATAL? *E? *F?
     cfg_file_items_dict['ignore_err_str'] = []
     cfg_file_items_dict['other_sim_log_files'] = []
     cfg_file_items_dict['blk_root'] = ''
@@ -546,8 +546,12 @@ def f_parse_config_file(input_cfg_file):
     if cfg_file_items_dict['blk_root']: global_defines.append('_BLK_ROOT_=\\\"'+cfg_file_items_dict['blk_root']+'\\\"')
     if cfg_file_items_dict['blk_design_root']: global_defines.append('_BLK_DESIGN_ROOT_=\\\"'+cfg_file_items_dict['blk_design_root']+'\\\"')
     if cfg_file_items_dict['blk_dv_root']: global_defines.append('_BLK_DV_ROOT_=\\\"'+cfg_file_items_dict['blk_dv_root']+'\\\"')
-    global_defines.append('_DESIGN_TOP_=\\\"'+cfg_file_items_dict['design_top']+'\\\"')
-    global_defines.append('_TB_TOP_=\\\"'+cfg_file_items_dict['tb_top']+'\\\"')
+    if cmd_line_args_dict['simulator'] == 'vcs':
+        global_defines.append('_DESIGN_TOP_='+cfg_file_items_dict['design_top'])
+        global_defines.append('_TB_TOP_='+cfg_file_items_dict['tb_top'])
+    else:
+        global_defines.append('_DESIGN_TOP_=\\\"'+cfg_file_items_dict['design_top']+'\\\"')
+        global_defines.append('_TB_TOP_=\\\"'+cfg_file_items_dict['tb_top']+'\\\"')
 
 def f_gen_folders():
     global generated_folders_info_dict
@@ -881,9 +885,35 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
             else:
                 f.write('-l $run_dir/comp.log\n')
         if cmd_line_args_dict['simulator'] == 'vcs': #TODO
-            f.write('vcs -full64 -v2k -sverilog -licqueue -lca +systemverilogext+.v +vcs+flush+log +vcs+lic+wait +vcs+fsdbon\\\n')
-            f.write('-timescale=1ns/1fs +lint=TFIPC-L -Xgc=+ -fastcomp=il -kdb -debug_all -ntb_otps uvm-1.1\\\n')
-            f.write('-cm line+cond+fsm+tgl -cm_hier [file] -o $run_dir/simv\n')
+            #f.write('vcs -full64 -v2k -sverilog -licqueue -lca +systemverilogext+.v +vcs+flush+log +vcs+lic+wait +vcs+fsdbon\\\n')
+            #f.write('-timescale=1ns/1fs +lint=TFIPC-L -Xgc=+ -fastcomp=il -kdb -debug_all -ntb_opts uvm-1.1\\\n')
+            #f.write('-cm line+cond+fsm+tgl+path+branch+assert -cm_hier [file] -o $run_dir/simv\n')
+            f.write('vcs -full64 +v2k -sverilog +systemverilogext+.v+.sv+.svh+.vh+.svi+.svp+.sva+.vm+.vg+.pkg+.mv+.SVM -lca\\\n')
+            if cmd_line_args_dict['uvm']: f.write('-ntb_opts uvm-1.1\\\n')
+            f.write('-timescale='+cfg_file_items_dict['time_scale']+'\\\n')
+            if cmd_line_args_dict['wave'] or cmd_line_args_dict['wall']:
+                f.write('-debug_access+all -kdb\\\n');
+                if cmd_line_args_dict['wave_type'] == 'fsdb':
+                    f.write('-fsdb +define+FSDB +vcs+fsdbon\\\n');
+            f.write(_define_macros+'\\\n')
+            if cmd_line_args_dict['automsg']: f.write('$run_dir/automsg.sv $run_dir/date.c\\\n')
+            f.write('-top '+cfg_file_items_dict['tb_top']+'\\\n')
+            f.write(' '.join(cmd_line_args_dict['plus_args'])+'\\\n')
+            f.write(' '.join(cmd_line_args_dict['extra_comp_options'])+'\\\n')
+            f.write(' '.join(cfg_file_items_dict['ext_opt'])+'\\\n')
+            f.write(' '.join(cfg_file_items_dict['ext_comp_opt'])+'\\\n')
+            f.write(' +incdir+'.join(cfg_file_items_dict['inc_dir'])+'\\\n')
+            f.write('+incdir+$case_dir +incdir+./\\\n')
+            f.write(' '.join(cfg_file_items_dict['lib_files'])+'\\\n')
+            f.write(' '.join(cfg_file_items_dict['model_files'])+'\\\n')
+            f.write(' '.join(cfg_file_items_dict['design_files'])+'\\\n')
+            f.write(' '.join(cfg_file_items_dict['dv_files'])+'\\\n')
+            if cmd_line_args_dict['uvm']: f.write('$case_path\\\n')
+            if cmd_line_args_dict['sim_on_gui']: f.write('-gui\\\n')
+            if regression_flag or cmd_line_args_dict['single_in_regr']:
+                f.write('+vcs+nostdout -l $run_dir/comp.log\n')
+            else:
+                f.write('-l $run_dir/comp.log\n')
         f.write('\tif ($? == 0) then\n')
         f.write('\t\tbreak\n')
         f.write('\telse\n')
@@ -940,6 +970,11 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
                 f.write('-nostdout -l $run_dir/sim_${date_str}__${time_str}_seed$seed.log\n')
             else:
                 f.write('-l $run_dir/sim_${date_str}__${time_str}_seed$seed.log\n')
+        if cmd_line_args_dict['simulator'] == 'vcs':
+            f.write('$run_dir/simv -l $run_dir/sim_${date_str}__${time_str}_seed$seed.log\n')
+            if cmd_line_args_dict['wave'] or cmd_line_args_dict['wall']:
+                if cmd_line_args_dict['wave_type'] == 'fsdb':
+                    f.write('\\ln -fs $run_dir/novas.fsdb $run_dir/waves.fsdb\n')
         f.write('\\ln -fs $run_dir/sim_${date_str}__${time_str}_seed$seed.log $run_dir/latest_sim.log\n')
         f.write('\n')
         f.write('#Post-simulate\n')
@@ -965,8 +1000,8 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
             f.write('-LOGFILE $run_dir/simvision.log $run_dir/waves.vcd&\n')
         elif cmd_line_args_dict['wave_type'] == 'fsdb':
             f.write('verdi -sv -logfile $run_dir/verdiLog/verdi.log -logdir $run_dir/verdiLog\\\n')
-            f.write('-uvmDebug -ntb_opts uvm -uvm\\\n')
-            f.write('+systemverilogext+.v+.vh+.sv+.svh+.svi+.svp+.pkg+.SVM =2012 -ssv -ssy -ssz\\\n')
+            f.write('-uvmDebug -ntb_opts uvm-1.1 -uvm\\\n')
+            f.write('+systemverilogext+.v+.vh+.sv+.svh+.svi+.svp+.pkg+.SVM -ssv -ssy -ssz\\\n')
             f.write('-f '+cfg_file_items_dict['tb_top']+'.f\\\n')
             f.write(' '.join(cmd_line_args_dict['extra_dbg_options'])+'\\\n')
             f.write(' '.join(cfg_file_items_dict['ext_dbg_opt'])+'\\\n')
