@@ -1251,6 +1251,9 @@ def f_run_and_parse(test, seed, folder, cmd, logs, interactive=True):
         if regression_flag:
             f_colorful_print('Pass: '+folder+' Seed: '+str(seed), 'green')
             print()
+    if cmd_line_args_dict['compile_only']:
+        print('!! Compile Only !!')
+        print()
     if (error_runs_in_regression+warn_runs_in_regression+pass_runs_in_regression) >= total_runs_in_regression: period_print_msg_interval = 1 #shorten message print interval
     f_gen_result_files(folder)
     if single_simulation_flag:
