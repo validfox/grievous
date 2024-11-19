@@ -2,7 +2,7 @@
 
 #
 # Author: xeroncn+validfox.grievous@gmail.com
-# Date: 2024.09.23
+# Date: 2024.11.19
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
@@ -48,6 +48,7 @@ single_simulation_flag = True #single simulation by default
 regression_flag = False
 block_simulation_flag = False
 top_simulation_flag = True
+localdv_flag = False
 
 env_usr = os.getenv('USER', 'undefine')
 env_hostname = os.getenv('HOSTNAME', 'undefine')
@@ -73,6 +74,7 @@ def f_parse_cmd_line(arg_list):
     global regression_flag
     global block_simulation_flag
     global top_simulation_flag
+    global localdv_flag
     global global_defines
     _all_args = iter(range(0, len(arg_list)))
     for _i in _all_args:
@@ -133,6 +135,7 @@ def f_parse_cmd_line(arg_list):
             cmd_line_args_dict['dv_folder'] = _curr[1:]
         elif re.match(r'^-localdv\d*$', _curr): #-localdv, -localdv0, -localdv1, ...
             cmd_line_args_dict['dv_folder'] = _curr[1:]
+            localdv_flag = True
         elif _curr in {'-rtl'}:
             cmd_line_args_dict['sim_type'] = 'rtl'
         elif _curr in {'-gate', '-gls'}:
@@ -269,7 +272,8 @@ def f_parse_cmd_line(arg_list):
         regression_flag = True
         if not cmd_line_args_dict['regr']: cmd_line_args_dict['regr_group']= ['default']
         cmd_line_args_dict['regr_group'].sort()
-    if not cmd_line_args_dict['test'] and not cmd_line_args_dict['regr']: sys.exit('No test and regression list is specified in command line.')
+    if (not localdv_flag) and (not cmd_line_args_dict['test'] and not cmd_line_args_dict['regr']):
+        sys.exit('No test and regression list is specified in command line.')
     if regression_flag: cmd_line_args_dict['interactivelsf'] = False #for regression, interactive lsf is disabled
     if cmd_line_args_dict['cov_cmd_line'] and cmd_line_args_dict['nocov_cmd_line']: #-nocov has higher priority
         cmd_line_args_dict['cov_enable'] = False
@@ -558,7 +562,9 @@ def f_gen_folders():
     global global_info_msg
     global sim_base_dir
     _path_of_test = ''
-    if single_simulation_flag:
+    if localdv_flag:
+        sim_base_dir = os.path.expandvars(cmd_line_args_dict['sim_root'])+'/'+cmd_line_args_dict['block']+'/localdv'
+    elif single_simulation_flag:
         if cmd_line_args_dict['block']:
             _path_of_test = f_find_file(env_prj_root, cmd_line_args_dict['test'][0]+'/'+cmd_line_args_dict['test'][0]+'.sv', cmd_line_args_dict['block']+'/'+cmd_line_args_dict['dv_folder']+'/tests')
         else:
@@ -604,7 +610,15 @@ def f_gen_folders():
         if os.path.isfile(sim_base_dir+'/_PASS_'): os.remove(sim_base_dir+'/_PASS_')
         os.chmod(sim_base_dir, 0o755)
         print(sim_base_dir)
-        if single_simulation_flag:
+        if localdv_flag:
+            f_gen_eda_wrapper_scripts(sim_base_dir, _path_of_test)
+            generated_folders_info_dict[sim_base_dir] = {} #extra info will be filled into the list
+            generated_folders_info_dict[sim_base_dir]['done'] = False
+            generated_folders_info_dict[sim_base_dir]['test'] = 'localdv'
+            generated_folders_info_dict[sim_base_dir]['seed'] = 0
+            generated_folders_info_dict[sim_base_dir]['parent'] = sim_base_dir
+            generated_folders_info_dict[sim_base_dir]['script'] = ' '.join(sys.argv)
+        elif single_simulation_flag:
             f_gen_eda_wrapper_scripts(sim_base_dir, _path_of_test)
             generated_folders_info_dict[sim_base_dir] = {} #extra info will be filled into the list
             generated_folders_info_dict[sim_base_dir]['done'] = False
@@ -793,6 +807,7 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
     if cfg_file_items_dict['blk_design_root']: _global_variables += 'setenv BLK_DESIGN_ROOT ' + cfg_file_items_dict['blk_design_root'] + '\n' + 'set blk_design_root = ${BLK_DESIGN_ROOT}' + '\n'
     if cfg_file_items_dict['blk_dv_root']: _global_variables += 'setenv BLK_DV_ROOT ' + cfg_file_items_dict['blk_dv_root'] + '\n' + 'set blk_dv_root = ${BLK_DV_ROOT}' + '\n'
     _global_variables += 'set run_dir = ' + sim_folder + '\n'
+    _global_variables += 'setenv run_dir ' + sim_folder + '\n'
     _global_variables += 'set case_name = ' + os.path.basename(test_path).replace('.sv', '') + '\n'
     _global_variables += 'set case_path = ' + test_path + '\n'
     _global_variables += 'set case_dir = ' + os.path.dirname(test_path) + '\n'
@@ -1494,7 +1509,11 @@ def main():
     else:
         _path_of_cfg = f_find_file(env_prj_root, cmd_line_args_dict['dv_folder']+'/sim.setup', env_prj_root+'/'+cmd_line_args_dict['dv_folder'])
         f_parse_config_file(_path_of_cfg)
-    if single_simulation_flag:
+    if localdv_flag:
+        _path_of_sub_cfg = ''
+        print('abc')
+    elif single_simulation_flag:
+        print('def')
         _path_of_sub_cfg = ''
         if cmd_line_args_dict['block']:
             _path_of_sub_cfg = f_find_file(env_prj_root, cmd_line_args_dict['test'][0]+'/sim.setup', cmd_line_args_dict['block']+'/'+cmd_line_args_dict['dv_folder']+'/tests')
