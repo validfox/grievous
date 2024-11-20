@@ -909,7 +909,7 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
             if cmd_line_args_dict['wave'] or cmd_line_args_dict['wall']:
                 f.write('-debug_access+all -kdb\\\n');
                 if cmd_line_args_dict['wave_type'] == 'fsdb':
-                    f.write('-fsdb +define+FSDB +vcs+fsdbon\\\n');
+                    f.write('-fsdb +define+FSDB +vcs+fsdbon+all\\\n');
             f.write(_define_macros+'\\\n')
             if cmd_line_args_dict['automsg']: f.write('$run_dir/automsg.sv $run_dir/date.c\\\n')
             f.write('-top '+cfg_file_items_dict['tb_top']+'\\\n')
@@ -960,6 +960,7 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
         f.write('\tset seed = $argv[1]\n')
         f.write('endif\n')
         f.write('\n')
+        f.write('\\ln -fs $run_dir/sim_${date_str}__${time_str}_seed$seed.log $run_dir/latest_sim.log\n')
         if cmd_line_args_dict['simulator'] == 'nc':
             f.write('xrun -nocopyright -64bit -R\\\n')
             if cmd_line_args_dict['sim_tmp']: f.write('-simtmp '+cmd_line_args_dict['sim_tmp']+'\\\n')
@@ -986,6 +987,9 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
             else:
                 f.write('-l $run_dir/sim_${date_str}__${time_str}_seed$seed.log\n')
         if cmd_line_args_dict['simulator'] == 'vcs':
+            if cmd_line_args_dict['wave'] or cmd_line_args_dict['wall']:
+                if cmd_line_args_dict['wave_type'] == 'fsdb':
+                    f.write('\\ln -fs $run_dir/novas.fsdb $run_dir/waves.fsdb\n')
             f.write('$run_dir/simv\\\n')
             f.write('+UVM_TESTNAME=$case_name\\\n')
             f.write('-l $run_dir/sim_${date_str}__${time_str}_seed$seed.log\n')
