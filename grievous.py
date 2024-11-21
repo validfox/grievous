@@ -2,7 +2,7 @@
 
 #
 # Author: xeroncn+validfox.grievous@gmail.com
-# Date: 2024.11.19
+# Date: 2024.11.21
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
@@ -423,7 +423,7 @@ def f_init_dicts():
     cfg_file_items_dict['cov_refine_files'] = []
     cfg_file_items_dict['warn_str'] = ['UVM_WARNING', '*W', 'Warning!'] #TODO: default warn list? UVM_WARNING? *W?
     cfg_file_items_dict['ignore_warn_str'] = []
-    cfg_file_items_dict['err_str'] = ['UVM_ERROR', 'UVM_FATAL', '*E', '*SE', '*F', 'Syntax error', 'Error-'] #TODO: default error list? such as UVM_ERROR? UVM_FATAL? *E? *F?
+    cfg_file_items_dict['err_str'] = ['UVM_ERROR', 'UVM_FATAL', '*E', '*SE', '*F', 'Syntax error', 'Error-', 'Error: '] #TODO: default error list? such as UVM_ERROR? UVM_FATAL? *E? *F?
     cfg_file_items_dict['ignore_err_str'] = []
     cfg_file_items_dict['other_sim_log_files'] = []
     cfg_file_items_dict['blk_root'] = ''
