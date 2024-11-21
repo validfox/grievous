@@ -1021,7 +1021,8 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
             f.write('-LOGFILE $run_dir/simvision.log $run_dir/waves.vcd&\n')
         elif cmd_line_args_dict['wave_type'] == 'fsdb':
             f.write('verdi -sv -logfile $run_dir/verdiLog/verdi.log -logdir $run_dir/verdiLog\\\n')
-            f.write('-uvmDebug -ntb_opts uvm-1.1 -uvm\\\n')
+            if cmd_line_args_dict['uvm']:
+                f.write('-uvmDebug -ntb_opts uvm-1.1 -uvm\\\n')
             f.write('+systemverilogext+.v+.vh+.sv+.svh+.svi+.svp+.pkg+.SVM -ssv -ssy -ssz\\\n')
             f.write('-f '+cfg_file_items_dict['tb_top']+'.f\\\n')
             f.write(' '.join(cmd_line_args_dict['extra_dbg_options'])+'\\\n')
