@@ -2,7 +2,7 @@
 
 #
 # Author: xeroncn+validfox.grievous@gmail.com
-# Date: 2024.11.21
+# Date: 2024.11.25
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
@@ -563,7 +563,7 @@ def f_gen_folders():
     global sim_base_dir
     _path_of_test = ''
     if localdv_flag:
-        sim_base_dir = os.path.expandvars(cmd_line_args_dict['sim_root'])+'/'+cmd_line_args_dict['block']+'/localdv'
+        sim_base_dir = os.path.expandvars(cmd_line_args_dict['sim_root'])+'/'+cmd_line_args_dict['block']+'/'+cmd_line_args_dict['dv_folder']
     elif single_simulation_flag:
         if cmd_line_args_dict['block']:
             _path_of_test = f_find_file(env_prj_root, cmd_line_args_dict['test'][0]+'/'+cmd_line_args_dict['test'][0]+'.sv', cmd_line_args_dict['block']+'/'+cmd_line_args_dict['dv_folder']+'/tests')
@@ -614,7 +614,7 @@ def f_gen_folders():
             f_gen_eda_wrapper_scripts(sim_base_dir, _path_of_test)
             generated_folders_info_dict[sim_base_dir] = {} #extra info will be filled into the list
             generated_folders_info_dict[sim_base_dir]['done'] = False
-            generated_folders_info_dict[sim_base_dir]['test'] = 'localdv'
+            generated_folders_info_dict[sim_base_dir]['test'] = cmd_line_args_dict['dv_folder']
             generated_folders_info_dict[sim_base_dir]['seed'] = 0
             generated_folders_info_dict[sim_base_dir]['parent'] = sim_base_dir
             generated_folders_info_dict[sim_base_dir]['script'] = ' '.join(sys.argv)
@@ -1516,9 +1516,7 @@ def main():
         f_parse_config_file(_path_of_cfg)
     if localdv_flag:
         _path_of_sub_cfg = ''
-        print('abc')
     elif single_simulation_flag:
-        print('def')
         _path_of_sub_cfg = ''
         if cmd_line_args_dict['block']:
             _path_of_sub_cfg = f_find_file(env_prj_root, cmd_line_args_dict['test'][0]+'/sim.setup', cmd_line_args_dict['block']+'/'+cmd_line_args_dict['dv_folder']+'/tests')
