@@ -993,7 +993,18 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
                 if cmd_line_args_dict['wave_type'] == 'fsdb':
                     f.write('\\ln -fs $run_dir/novas.fsdb $run_dir/waves.fsdb\n')
             f.write('$run_dir/simv\\\n')
+            if cmd_line_args_dict['max_quit_count'] > -1:
+                f.write('+UVM_MAX_QUIT_COUNT='+str(cmd_line_args_dict['max_quit_count'])+'\\\n')
+            elif cfg_file_items_dict['max_quit_count'] > -1:
+                f.write('+UVM_MAX_QUIT_COUNT='+str(cfg_file_items_dict['max_quit_count'])+'\\\n')
+            else:
+                f.write('+UVM_MAX_QUIT_COUNT=100\\\n')
+            f.write('+UVM_TIMEOUT='+cfg_file_items_dict['uvm_timeout']+',NO\\\n')
             f.write('+UVM_TESTNAME=$case_name\\\n')
+            f.write(' '.join(cmd_line_args_dict['plus_args'])+'\\\n')
+            f.write(' '.join(cmd_line_args_dict['extra_sim_options'])+'\\\n')
+            f.write(' '.join(cfg_file_items_dict['ext_opt'])+'\\\n')
+            f.write(' '.join(cfg_file_items_dict['ext_sim_opt'])+'\\\n')
             f.write('-l $run_dir/sim_${date_str}__${time_str}_seed$seed.log\n')
             if cmd_line_args_dict['wave'] or cmd_line_args_dict['wall']:
                 if cmd_line_args_dict['wave_type'] == 'fsdb':
