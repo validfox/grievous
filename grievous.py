@@ -2,7 +2,7 @@
 
 #
 # Author: xeroncn+validfox.grievous@gmail.com
-# Date: 2024.11.25
+# Date: 2024.11.26
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
@@ -351,14 +351,14 @@ def f_init_dicts():
     cmd_line_args_dict['seed'] = str(random.randint(1,2147483647)) #min:1, max:0x7FFFFFFF #cannot larger than 0x7FFFFFFF or else a negtive seed is got
     cmd_line_args_dict['wave'] = False
     cmd_line_args_dict['wall'] = False
-    cmd_line_args_dict['wave_type'] = wave_types_list[0]
+    cmd_line_args_dict['wave_type'] = wave_types_list[1] #wave_types_list = ['shm', 'fsdb', 'vcd', 'vpd']
     cmd_line_args_dict['automsg'] = True
     cmd_line_args_dict['tcl_files'] = []
     cmd_line_args_dict['block'] = ''
     cmd_line_args_dict['dv_folder'] = 'dv'
-    cmd_line_args_dict['sim_type'] = sim_types_list[0]
+    cmd_line_args_dict['sim_type'] = sim_types_list[0] #sim_types_list = ['rtl', 'gls', 'fpga', 'cosim', 'fault']
     cmd_line_args_dict['tfiles'] = []
-    cmd_line_args_dict['lsf'] = True
+    cmd_line_args_dict['lsf'] = False #True
     cmd_line_args_dict['interactivelsf'] = True #not used when regression
     cmd_line_args_dict['lsf_job_group_name'] = env_usr+time_label
     cmd_line_args_dict['single_in_regr'] = False
@@ -385,7 +385,7 @@ def f_init_dicts():
     cmd_line_args_dict['cov_refine_files'] = []
     cmd_line_args_dict['daily_folder'] = '' #for daily regression
     cmd_line_args_dict['sim_on_gui'] = False
-    cmd_line_args_dict['simulator'] = simulators_list[0]
+    cmd_line_args_dict['simulator'] = simulators_list[1] #simulators_list = ['nc', 'vcs']
     cmd_line_args_dict['sim_tmp'] = '' #for nc only, to specify a folder to store tmp files
     cmd_line_args_dict['plus_args'] = []
     cmd_line_args_dict['enable_custom_switch_valueless'] = {}
