@@ -398,7 +398,7 @@ def f_init_dicts():
     cfg_file_items_dict['custom_switch'] = []
     cfg_file_items_dict['design_top'] = ''
     cfg_file_items_dict['tb_top'] = ''
-    cfg_file_items_dict['inc_dir'] = ''
+    cfg_file_items_dict['inc_dir'] = []
     cfg_file_items_dict['design_files'] = []
     cfg_file_items_dict['dv_files'] = []
     cfg_file_items_dict['lib_files'] = []
@@ -887,7 +887,8 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
                 if cfg_file_items_dict['cov_dut']:
                     f.write('-covdut '+' -covdut '.join(cfg_file_items_dict['cov_dut'])+'\\\n')
                 else: f.write('-covdut '+cfg_file_items_dict['tb_top']+'\\\n')
-            f.write(' +incdir+'.join(cfg_file_items_dict['inc_dir'])+'\\\n')
+            if cfg_file_items_dict['inc_dir']:
+                f.write(' +incdir+' + ' +incdir+'.join(cfg_file_items_dict['inc_dir'])+'\\\n')
             f.write('+incdir+$case_dir +incdir+./\\\n')
             f.write(' '.join(cfg_file_items_dict['lib_files'])+'\\\n')
             f.write(' '.join(cfg_file_items_dict['model_files'])+'\\\n')
@@ -917,7 +918,8 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
             f.write(' '.join(cmd_line_args_dict['extra_comp_options'])+'\\\n')
             f.write(' '.join(cfg_file_items_dict['ext_opt'])+'\\\n')
             f.write(' '.join(cfg_file_items_dict['ext_comp_opt'])+'\\\n')
-            f.write(' +incdir+'.join(cfg_file_items_dict['inc_dir'])+'\\\n')
+            if cfg_file_items_dict['inc_dir']:
+                f.write(' +incdir+' + ' +incdir+'.join(cfg_file_items_dict['inc_dir'])+'\\\n')
             f.write('+incdir+$case_dir +incdir+./\\\n')
             f.write(' '.join(cfg_file_items_dict['lib_files'])+'\\\n')
             f.write(' '.join(cfg_file_items_dict['model_files'])+'\\\n')
