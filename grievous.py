@@ -2,7 +2,7 @@
 
 #
 # Author: xeroncn+validfox.grievous@gmail.com
-# Date: 2024.11.26
+# Date: 2024.11.27
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
@@ -1033,10 +1033,13 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
             f.write(' '.join(cfg_file_items_dict['ext_dbg_opt'])+'\\\n')
             f.write('-LOGFILE $run_dir/simvision.log $run_dir/waves.vcd&\n')
         elif cmd_line_args_dict['wave_type'] == 'fsdb':
-            f.write('verdi -sv -logfile $run_dir/verdiLog/verdi.log -logdir $run_dir/verdiLog\\\n')
+            f.write('verdi -sv -2001 -2012 -logfile $run_dir/verdiLog/verdi.log -logdir $run_dir/verdiLog\\\n')
             if cmd_line_args_dict['uvm']:
                 f.write('-uvmDebug -ntb_opts uvm-1.1 -uvm\\\n')
             f.write('+systemverilogext+.v+.vh+.sv+.svh+.svi+.svp+.pkg+.SVM -ssv -ssy -ssz\\\n')
+            if cfg_file_items_dict['inc_dir']:
+                f.write(' +incdir+' + ' +incdir+'.join(cfg_file_items_dict['inc_dir'])+'\\\n')
+            f.write('+incdir+$case_dir +incdir+./\\\n')
             f.write('-f '+cfg_file_items_dict['tb_top']+'.f\\\n')
             f.write(' '.join(cmd_line_args_dict['extra_dbg_options'])+'\\\n')
             f.write(' '.join(cfg_file_items_dict['ext_dbg_opt'])+'\\\n')
