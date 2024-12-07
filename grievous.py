@@ -2,7 +2,7 @@
 
 #
 # Author: xeroncn+validfox.grievous@gmail.com
-# Date: 2024.12.05
+# Date: 2024.12.07
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
@@ -1253,7 +1253,7 @@ def f_run_and_parse(test, seed, folder, cmd, logs, interactive=True):
     generated_folders_info_dict[folder]['simend'] = datetime.datetime.now() #the time after running
     generated_folders_info_dict[folder]['simwindow'] = \
 	str(generated_folders_info_dict[folder]['simend']-generated_folders_info_dict[folder]['simstart'])
-    return_list = f_parse_log(logs) #comp.log is parsed when '-compile_only', or else, simulation logs are parsed
+    return_list = f_parse_log(logs, folder) #comp.log is parsed when '-compile_only', or else, simulation logs are parsed
     generated_folders_info_dict[folder]['logparsedtime'] = datetime.datetime.now() #the time after parsing simulation log
     if return_list[0]:
         generated_folders_info_dict[folder]['result'] = '_ERROR_'
@@ -1321,10 +1321,13 @@ def f_check_unfinished_items():
     for i in generated_folders_info_dict.keys():
         if not generated_folders_info_dict[i]['done']: print('\t\t'+i)
 
-def f_parse_log(logs): #return first error, first warning and file name
+def f_parse_log(logs, simfolder): #return first error, first warning and file name
     return_list = ['', '', '']
     for _l in logs:
+        if _l.startswith('$run_dir'):
+            _l = _l.replace('$run_dir', simfolder)
         if not os.path.exists(_l): return ['File Not Exist','',_l]
+        print('Paring '+_l+' ...')
         with open(_l, 'r') as f:
             got_error = False
             got_warning = False
