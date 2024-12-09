@@ -2,7 +2,7 @@
 
 #
 # Author: xeroncn+validfox.grievous@gmail.com
-# Date: 2024.12.07
+# Date: 2024.12.09
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
@@ -230,6 +230,7 @@ def f_parse_cmd_line(arg_list):
             cmd_line_args_dict['gen_scripts_only'] = True
         elif _curr in {'-cov'}:
             cmd_line_args_dict['cov_cmd_line'] = True
+            cmd_line_args_dict['cov_enable'] = True
         elif _curr in {'-cm', '-cov_merge'}:
             cmd_line_args_dict['cov_merge'] = True
         elif _curr in {'-nocov'}:
@@ -905,12 +906,17 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
             #f.write('-timescale=1ns/1fs +lint=TFIPC-L -Xgc=+ -fastcomp=il -kdb -debug_all -ntb_opts uvm-1.1\\\n')
             #f.write('-cm line+cond+fsm+tgl+path+branch+assert -cm_hier [file] -o $run_dir/simv\n')
             f.write('vcs -full64 +v2k -sverilog +systemverilogext+.v+.sv+.svh+.vh+.svi+.svp+.sva+.vm+.vg+.pkg+.mv+.SVM -lca\\\n')
+            f.write('+vcs+flush+log +vcs+lic+wait -Xgc=+ -fastcomp=il -kdb -assert svaext\\\n')
+            if cmd_line_args_dict['cov_enable']:
+                f.write('-cm cond+tgl+line+fsm+branch+assert -cm_line contassign -cm_cond allops+anywidth+event -cm_tgl mda -cm_noconst\\\n')
+                #f.write('-cm_hier'+??+'\\\n')
             if cmd_line_args_dict['uvm']: f.write('-ntb_opts uvm-1.1\\\n')
             f.write('-timescale='+cfg_file_items_dict['time_scale']+'\\\n')
             if cmd_line_args_dict['wave'] or cmd_line_args_dict['wall']:
-                f.write('-debug_access+all -kdb\\\n');
+                f.write('-debug_access+all -debug_region+cell+lib+encrypt\\\n');
+                f.write('-P $VERDI_HOME/share/PLI/VCS/LINUX64/novas.tab $VERDI_HOME/share/PLI/VCS/LINUX64/pli.a\\\n'); #seems not necessary for dump fsdb
                 if cmd_line_args_dict['wave_type'] == 'fsdb':
-                    f.write('-fsdb +define+FSDB +vcs+fsdbon+all\\\n');
+                    f.write('-fsdb +define+FSDB +vcs+fsdbon+all +define+UVM_VERDI_COMPWAVE\\\n');
             f.write(_define_macros+'\\\n')
             if cmd_line_args_dict['automsg']: f.write('$run_dir/automsg.sv $run_dir/date.c\\\n')
             f.write('-top '+cfg_file_items_dict['tb_top']+'\\\n')
@@ -993,6 +999,9 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
                 if cmd_line_args_dict['wave_type'] == 'fsdb':
                     f.write('\\ln -fs $run_dir/novas.fsdb $run_dir/waves.fsdb\n')
             f.write('$run_dir/simv\\\n')
+            if cmd_line_args_dict['cov_enable']:
+                f.write('-cm cond+tgl+line+fsm+branch+assert -cm_name $case_name\\\n')
+                #f.write('-cm_hier'+??+'\\\n')
             if cmd_line_args_dict['max_quit_count'] > -1:
                 f.write('+UVM_MAX_QUIT_COUNT='+str(cmd_line_args_dict['max_quit_count'])+'\\\n')
             elif cfg_file_items_dict['max_quit_count'] > -1:
@@ -1047,19 +1056,29 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
         f.write('\n')
     os.chmod(sim_folder+'/guidebug.sh', 0o755)
 
-    with open(sim_folder+'/dump_wave.tcl', 'w+') as f:
-        if cmd_line_args_dict['wave_type'] == "shm":
-            f.write('database -open waves -into '+sim_folder+'/waves.shm -incsize 2G -event -default\n')
-            f.write('probe -create -packed 0 -shm -all -dynamic -memories -depth all\n')
-            f.write('run\n')
-        elif cmd_line_args_dict['wave_type'] == "fsdb":
-            f.write('call fsdbAutoSwitchDumpfile 2048 '+sim_folder+'/waves.fsdb 50 '+sim_folder+'/waves.log\n')
-            f.write('call fsdbDumpvars \"all\"\n')
-            f.write('run\n')
-        elif cmd_line_args_dict['wave_type'] == "vcd":
-            f.write('database -open waves -vcd -into '+sim_folder+'/waves.vcd -event -default\n')
-            f.write('probe -create -packed 0 -vcd -all -dynamic -memories -depth all\n')
-            f.write('run\n')
+    if (cmd_line_args_dict['simulator'] == 'vcs') and cmd_line_args_dict['cov_enable']:
+        with open(sim_folder+'/covgui.sh', 'w+') as f:
+            f.write('#! /bin/csh\n')
+            f.write(_global_variables)
+            f.write('\n')
+            f.write('\n')
+            f.write('verdi -cov -covdir $run_dir/simv.vdb&\n')
+        os.chmod(sim_folder+'/covgui.sh', 0o755)
+
+    if cmd_line_args_dict['simulator'] == 'nc':
+        with open(sim_folder+'/dump_wave.tcl', 'w+') as f:
+            if cmd_line_args_dict['wave_type'] == "shm":
+                f.write('database -open waves -into '+sim_folder+'/waves.shm -incsize 2G -event -default\n')
+                f.write('probe -create -packed 0 -shm -all -dynamic -memories -depth all\n')
+                f.write('run\n')
+            elif cmd_line_args_dict['wave_type'] == "fsdb":
+                f.write('call fsdbAutoSwitchDumpfile 2048 '+sim_folder+'/waves.fsdb 50 '+sim_folder+'/waves.log\n')
+                f.write('call fsdbDumpvars \"all\"\n')
+                f.write('run\n')
+            elif cmd_line_args_dict['wave_type'] == "vcd":
+                f.write('database -open waves -vcd -into '+sim_folder+'/waves.vcd -event -default\n')
+                f.write('probe -create -packed 0 -vcd -all -dynamic -memories -depth all\n')
+                f.write('run\n')
     
     with open(sim_folder+'/'+cfg_file_items_dict['tb_top']+'.f', 'w+') as f: #TODO, need update
         f.write(_define_macros+'\n')
