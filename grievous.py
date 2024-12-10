@@ -2,7 +2,7 @@
 
 #
 # Author: xeroncn+validfox.grievous@gmail.com
-# Date: 2024.12.09
+# Date: 2024.12.10
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
@@ -139,7 +139,7 @@ def f_parse_cmd_line(arg_list):
         elif _curr in {'-rtl'}:
             cmd_line_args_dict['sim_type'] = 'rtl'
         elif _curr in {'-gate', '-gls'}:
-            cmd_line_args_dict['sim_type'] = 'gate'
+            cmd_line_args_dict['sim_type'] = 'gls'
         elif _curr in {'-fpga'}:
             cmd_line_args_dict['sim_type'] = 'fpga'
         #elif _curr in {'-cosim'}:
@@ -473,7 +473,7 @@ def f_parse_config_file(input_cfg_file):
                 _main_key = ''
                 for _sk in _sub_key_list:
                     if _sk[0]=='!' and _sk[1:].islower(): #below lines has priorities
-                        if _sk[1:] not in custom_switch_in_cfg_file_dict.keys(): sys.exit(_sk[1:]+' not defined, or used before declared')
+                        if _sk[1:] not in list(custom_switch_in_cfg_file_dict.keys())+sim_types_list+wave_types_list+simulators_list: sys.exit(_sk[1:]+' not defined, or used before declared')
                         if _sk[1:] in custom_switch_on_cmd_line_dict.keys():
                             if custom_switch_on_cmd_line_dict[_sk[1:]] != '_disable': break #if custom switch is not disabled in cmd line by '--'
                         elif _sk[1:] in custom_switch_in_cfg_file_dict.keys():
@@ -488,7 +488,7 @@ def f_parse_config_file(input_cfg_file):
                         if _sk[1:] == 'regr' and regression_flag: break
                         if _sk[1:] == 'dumpwave' and (cmd_line_args_dict['wave'] or cmd_line_args_dict['wall']): break
                     elif _sk.islower(): #below lines has priorities
-                        if _sk not in custom_switch_in_cfg_file_dict.keys(): sys.exit(_sk+' not defined, or used before declared')
+                        if _sk not in list(custom_switch_in_cfg_file_dict.keys())+sim_types_list+wave_types_list+simulators_list: sys.exit(_sk+' not defined, or used before declared')
                         if _sk in custom_switch_on_cmd_line_dict.keys():
                             if custom_switch_on_cmd_line_dict[_sk] == '_disable': break #if custom switch is disabled in cmd line by '--'
                         elif _sk in custom_switch_in_cfg_file_dict.keys():
@@ -572,6 +572,8 @@ def f_gen_folders():
             _path_of_test = f_find_file(env_prj_root+'/'+cmd_line_args_dict['dv_folder']+'/tests', cmd_line_args_dict['test'][0]+'/'+cmd_line_args_dict['test'][0]+'.sv')
         if not _path_of_test: sys.exit(cmd_line_args_dict['test'][0]+'.sv not exist') #FIXME when there's only C test in folder
         sim_base_dir = os.path.expandvars(cmd_line_args_dict['sim_root'])+'/'+cmd_line_args_dict['block']+'/'+cmd_line_args_dict['test'][0]
+        if cmd_line_args_dict['sim_type'] != 'rtl':
+            sim_base_dir += '_'+cmd_line_args_dict['sim_type']
     elif regression_flag:
         f_gen_regr_list()
         sim_base_dir = os.path.expandvars(cmd_line_args_dict['sim_root'])+'/'+cmd_line_args_dict['block']+'/'+cmd_line_args_dict['daily_folder']+'/regr_'+(''.join(cmd_line_args_dict['regr_group']).lower())+'_'+time_label
@@ -999,6 +1001,10 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
                 if cmd_line_args_dict['wave_type'] == 'fsdb':
                     f.write('\\ln -fs $run_dir/novas.fsdb $run_dir/waves.fsdb\n')
             f.write('$run_dir/simv\\\n')
+            if cmd_line_args_dict['wave'] or cmd_line_args_dict['wall']:
+                if cmd_line_args_dict['wave_type'] == 'fsdb':
+                    f.write('+fsdb+autoflush +fsdb+dump_limit=1024 +fsdb+dump_log=on\\\n')
+                    f.write('+fsdb+delta +fsdbfile+novas\\\n')
             if cmd_line_args_dict['cov_enable']:
                 f.write('-cm cond+tgl+line+fsm+branch+assert -cm_name $case_name\\\n')
                 #f.write('-cm_hier'+??+'\\\n')
