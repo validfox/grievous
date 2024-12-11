@@ -2,7 +2,7 @@
 
 #
 # Author: xeroncn+validfox.grievous@gmail.com
-# Date: 2024.12.10
+# Date: 2024.12.11
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
@@ -918,7 +918,7 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
                 f.write('-debug_access+all -debug_region+cell+lib+encrypt\\\n');
                 f.write('-P $VERDI_HOME/share/PLI/VCS/LINUX64/novas.tab $VERDI_HOME/share/PLI/VCS/LINUX64/pli.a\\\n'); #seems not necessary for dump fsdb
                 if cmd_line_args_dict['wave_type'] == 'fsdb':
-                    f.write('-fsdb +define+FSDB +vcs+fsdbon+all +define+UVM_VERDI_COMPWAVE\\\n');
+                    f.write('+define+FSDB +vcs+fsdbon+all +define+UVM_VERDI_COMPWAVE\\\n');
             f.write(_define_macros+'\\\n')
             if cmd_line_args_dict['automsg']: f.write('$run_dir/automsg.sv $run_dir/date.c\\\n')
             f.write('-top '+cfg_file_items_dict['tb_top']+'\\\n')
@@ -1003,8 +1003,9 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
             f.write('$run_dir/simv\\\n')
             if cmd_line_args_dict['wave'] or cmd_line_args_dict['wall']:
                 if cmd_line_args_dict['wave_type'] == 'fsdb':
-                    f.write('+fsdb+autoflush +fsdb+dump_limit=1024 +fsdb+dump_log=on\\\n')
-                    f.write('+fsdb+delta +fsdbfile+novas\\\n')
+                    #f.write('+fsdb+autoflush +fsdb+dump_limit=1024 +fsdb+dump_log=on\\\n')
+                    #f.write('+fsdb+delta +fsdbfile+novas\\\n')
+                    f.write('+fsdb+all +fsdb+autoflush\\\n')
             if cmd_line_args_dict['cov_enable']:
                 f.write('-cm cond+tgl+line+fsm+branch+assert -cm_name $case_name\\\n')
                 #f.write('-cm_hier'+??+'\\\n')
