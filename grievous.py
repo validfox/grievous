@@ -55,6 +55,7 @@ env_hostname = os.getenv('HOSTNAME', 'undefine')
 env_prj_name = os.getenv('PRJ_NAME', 'undefine')
 env_prj_root = os.getenv('PRJ_ROOT', 'undefine')
 env_design_root = os.getenv('DESIGN_ROOT', 'undefine')
+env_dig_root = os.getenv('DIG_ROOT', 'undefine')
 env_dv_root = os.getenv('DV_ROOT', 'undefine')
 env_sim_root = os.getenv('SIM_ROOT', 'undefine')
 
@@ -295,6 +296,7 @@ def f_parse_cmd_line(arg_list):
     global_defines.append('_PRJ_NAME_=\\\"'+env_prj_name+'\\\"')
     global_defines.append('_PRJ_ROOT_=\\\"'+env_prj_root+'\\\"')
     global_defines.append('_DESIGN_ROOT_=\\\"'+env_design_root+'\\\"')
+    global_defines.append('_DIG_ROOT_=\\\"'+env_dig_root+'\\\"')
     global_defines.append('_DV_ROOT_=\\\"'+env_dv_root+'\\\"')
     global_defines.append('_SIM_ROOT_=\\\"'+env_sim_root+'\\\"')
     if cmd_line_args_dict['uvm']:
@@ -429,6 +431,7 @@ def f_init_dicts():
     cfg_file_items_dict['other_sim_log_files'] = []
     cfg_file_items_dict['blk_root'] = ''
     cfg_file_items_dict['blk_design_root'] = ''
+    cfg_file_items_dict['blk_dig_root'] = ''
     cfg_file_items_dict['blk_dv_root'] = ''
 
 def f_help_doc():
@@ -526,7 +529,7 @@ def f_parse_config_file(input_cfg_file):
                     cfg_file_items_dict[_main_key.lower()].append(_value)
                 elif _main_key in {'TIME_SCALE', 'UVM_TIMEOUT', 'MAX_QUIT_COUNT', 'COMPILE_REPEAT_TIMES'}:
                     cfg_file_items_dict[_main_key.lower()] = _value
-                elif _main_key in {'BLK_ROOT', 'BLK_DESIGN_ROOT', 'BLK_DV_ROOT'}:
+                elif _main_key in {'BLK_ROOT', 'BLK_DESIGN_ROOT', 'BLK_DIG_ROOT', 'BLK_DV_ROOT'}:
                     cfg_file_items_dict[_main_key.lower()] = os.path.expandvars(_value)
                 elif _main_key in {'TCL_FILES', 'TFILES'}:
                     cfg_file_items_dict[_main_key.lower()].append(os.path.expandvars(_value))
@@ -550,6 +553,7 @@ def f_parse_config_file(input_cfg_file):
     #post process
     if cfg_file_items_dict['blk_root']: global_defines.append('_BLK_ROOT_=\\\"'+cfg_file_items_dict['blk_root']+'\\\"')
     if cfg_file_items_dict['blk_design_root']: global_defines.append('_BLK_DESIGN_ROOT_=\\\"'+cfg_file_items_dict['blk_design_root']+'\\\"')
+    if cfg_file_items_dict['blk_dig_root']: global_defines.append('_BLK_DIG_ROOT_=\\\"'+cfg_file_items_dict['blk_dig_root']+'\\\"')
     if cfg_file_items_dict['blk_dv_root']: global_defines.append('_BLK_DV_ROOT_=\\\"'+cfg_file_items_dict['blk_dv_root']+'\\\"')
     if cmd_line_args_dict['simulator'] == 'vcs':
         global_defines.append('_DESIGN_TOP_='+cfg_file_items_dict['design_top'])
@@ -804,10 +808,13 @@ def f_gen_eda_wrapper_scripts(sim_folder, test_path):
     _global_variables += 'setenv TMPDIR ' + cmd_line_args_dict['sim_tmp'] + '\n' + 'set tmpdir = ${TMPDIR}' + '\n'
     _global_variables += 'setenv PRJ_NAME ' + env_prj_name + '\n' + 'set prj_name = ${PRJ_NAME}' + '\n'
     _global_variables += 'setenv PRJ_ROOT ' + env_prj_root + '\n' + 'set prj_root = ${PRJ_ROOT}' + '\n'
+    _global_variables += 'setenv DESIGN_ROOT ' + env_design_root + '\n' + 'set design_root = ${DESIGN_ROOT}' + '\n'
+    _global_variables += 'setenv DIG_ROOT ' + env_design_root + '\n' + 'set dig_root = ${DIG_ROOT}' + '\n'
     _global_variables += 'setenv DV_ROOT ' + env_dv_root + '\n' + 'set dv_root = ${DV_ROOT}' + '\n'
     _global_variables += 'setenv SIM_ROOT ' + env_sim_root + '\n' + 'set sim_root = ${SIM_ROOT}' + '\n'
     if cfg_file_items_dict['blk_root']: _global_variables += 'setenv BLK_ROOT ' + cfg_file_items_dict['blk_root'] + '\n' + 'set blk_root = ${BLK_ROOT}' + '\n'
     if cfg_file_items_dict['blk_design_root']: _global_variables += 'setenv BLK_DESIGN_ROOT ' + cfg_file_items_dict['blk_design_root'] + '\n' + 'set blk_design_root = ${BLK_DESIGN_ROOT}' + '\n'
+    if cfg_file_items_dict['blk_dig_root']: _global_variables += 'setenv BLK_DIG_ROOT ' + cfg_file_items_dict['blk_dig_root'] + '\n' + 'set blk_dig_root = ${BLK_DIG_ROOT}' + '\n'
     if cfg_file_items_dict['blk_dv_root']: _global_variables += 'setenv BLK_DV_ROOT ' + cfg_file_items_dict['blk_dv_root'] + '\n' + 'set blk_dv_root = ${BLK_DV_ROOT}' + '\n'
     _global_variables += 'set run_dir = ' + sim_folder + '\n'
     _global_variables += 'setenv run_dir ' + sim_folder + '\n'
@@ -1362,6 +1369,7 @@ def f_parse_log(logs, simfolder): #return first error, first warning and file na
                 ignore_error = False
                 _line = str(_line).replace('\n', '').replace('\t', '').strip()
                 if len(_line) == 0: continue
+                if _line == '--- UVM Report catcher Summary ---': break
                 if _line == '--- UVM Report Summary ---': break
                 for _w in cfg_file_items_dict['ignore_warn_str']:
                     if _w in _line:
